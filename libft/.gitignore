@@ -1,0 +1,7 @@
+*.o
+*.a
+*.so
+.vscode
+a.out
+test
+tests/*
