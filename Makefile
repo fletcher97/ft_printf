@@ -3,7 +3,8 @@ BIN_DIR = bin
 SRC_DIR = src
 INC_DIR = inc
 OBJ_DIR = obj
-CFLAGS = -Wall -Wextra -Werror -g #TODO remove -g
+CFLAGS = -Wall -Wextra -Werror
+DFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
 
 AR = ar rcs
 
