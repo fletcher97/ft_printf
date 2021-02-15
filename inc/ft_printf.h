@@ -6,7 +6,7 @@
 /*   By: mgueifao <mgueifao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 19:21:10 by mgueifao          #+#    #+#             */
-/*   Updated: 2021/02/07 11:46:43 by mgueifao         ###   ########.fr       */
+/*   Updated: 2021/02/11 10:27:20 by mgueifao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,9 @@
 # define B8 0x80
 
 # define FLAGS "-0*"
+
+# define HEX_L "0123456789abcdef"
+# define HEX_U "0123456789ABCDEF"
 
 typedef struct	s_fields
 {
