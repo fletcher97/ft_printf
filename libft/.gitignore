@@ -1,7 +1,7 @@
 *.o
+*.d
 *.a
 *.so
 .vscode
 a.out
-test
-tests/*
+tests
