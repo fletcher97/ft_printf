@@ -6,11 +6,15 @@
 /*   By: mgueifao <mgueifao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 19:43:24 by mgueifao          #+#    #+#             */
-/*   Updated: 2021/02/07 12:02:59 by mgueifao         ###   ########.fr       */
+/*   Updated: 2021/02/17 15:33:14 by mgueifao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+# include <stdarg.h>
+
+#include "ft_string.h"
+#include "ft_stdio.h"
+#include "ft_stdlib.h"
 #include "ft_printf.h"
 
 /*
@@ -47,7 +51,7 @@ static int	proc(char *s, va_list args)
 	t_fields	*fields;
 	int			ret;
 
-	if (!args || !(fields = malloc(sizeof(t_fields))))
+	if (!args || !(fields = ft_malloc(sizeof(t_fields))))
 		return (-1);
 	s = proc_flags(s, fields);
 	if (fields->flags != -1)
@@ -59,8 +63,8 @@ static int	proc(char *s, va_list args)
 		ft_putstr_fd(s, 1);
 	}
 	ret = ft_strlen(s);
-	free(s);
-	free(fields);
+	ft_free(s);
+	ft_free(fields);
 	return (ret);
 }
 
@@ -88,10 +92,10 @@ int			ft_printf(const char *str, ...)
 		{
 			ret += proc(tok, args);
 		}
-		free(tok);
+		ft_free(tok);
 		tok = ft_strtok_m(NULL);
 	}
 	va_end(args);
-	free(s);
+	ft_free(s);
 	return (ret);
 }

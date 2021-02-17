@@ -6,14 +6,13 @@
 /*   By: mgueifao <mgueifao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/07 07:32:57 by mgueifao          #+#    #+#             */
-/*   Updated: 2021/02/07 13:58:46 by mgueifao         ###   ########.fr       */
+/*   Updated: 2021/02/17 15:35:39 by mgueifao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-
 #include "ft_printf.h"
-#include "libft.h"
+#include "ft_string.h"
+#include "ft_stdlib.h"
 
 void	pad_precision_num(char **str, int width)
 {
@@ -42,7 +41,7 @@ void	pad_precision_num(char **str, int width)
 		else
 			ft_memcpy(ret + width - ft_strlen(*str), *str, ft_strlen(*str));
 	}
-	free(*str);
+	ft_free(*str);
 	*str = ret;
 }
 
@@ -74,6 +73,6 @@ void	pad_width_num(char **str, t_fields *f)
 	}
 	if (**str == '-' && pad == '0')
 		ret[0] = '-';
-	free(*str);
+	ft_free(*str);
 	*str = ret;
 }

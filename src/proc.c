@@ -6,11 +6,15 @@
 /*   By: mgueifao <mgueifao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/25 17:57:09 by mgueifao          #+#    #+#             */
-/*   Updated: 2021/02/07 12:27:00 by mgueifao         ###   ########.fr       */
+/*   Updated: 2021/02/17 15:37:10 by mgueifao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+# include <stdarg.h>
+
+#include "ft_string.h"
+#include "ft_stdlib.h"
+#include "ft_ctype.h"
 #include "ft_printf.h"
 
 char	*proc_flags(char *s, t_fields *f)
@@ -18,7 +22,7 @@ char	*proc_flags(char *s, t_fields *f)
 	int i;
 
 	f->flags = 0;
-	while (*s && (i = ft_strchr_i(FLAGS, *s)) != -1 && f->flags != -1)
+	while (*s && (i = ft_strichr(FLAGS, *s)) != -1 && f->flags != -1)
 	{
 		if ((f->flags & (1 << i)) == 0)
 			f->flags += 1 << i;
