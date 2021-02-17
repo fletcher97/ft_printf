@@ -6,19 +6,14 @@
 /*   By: mgueifao <mgueifao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 19:21:10 by mgueifao          #+#    #+#             */
-/*   Updated: 2021/02/11 10:27:20 by mgueifao         ###   ########.fr       */
+/*   Updated: 2021/02/17 16:19:49 by mgueifao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_PRINTF_H
 # define FT_PRINTF_H
 
-//TODO remove
-# include <stdio.h>
-
 # include <stdarg.h>
-# include <stdlib.h>
-# include <stdint.h>
 
 # define B1 0x01
 # define B2 0x02

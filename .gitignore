@@ -1,8 +1,11 @@
 a.out
+*.d
+*.o
+*.a
 obj
-test
+mytest
 libft/.git
-libftprintf.a
 pft
 .vscode
 .DStore
+.init

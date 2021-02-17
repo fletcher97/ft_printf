@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "ft_printf.h"
-#include "libft.h"
+// #include "libft.h"
 
 void	print_bin(char b)
 {

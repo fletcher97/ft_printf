@@ -1,57 +1,210 @@
-CC = gcc
-BIN_DIR = bin
-SRC_DIR = src
-INC_DIR = inc
-OBJ_DIR = obj
-CFLAGS = -Wall -Wextra -Werror
-DFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
+################################################################################
+# Makefile
+################################################################################
 
+# Makefile by fletcher
+# Version: 1.0
+
+# This makefile can be copied to a directory and it will generate the file
+# structure and initialize a git repository with the .init rule. Any variables
+# and rules for the specifique project can be added in the appropriate section.
+
+################################################################################
+# Project Variables
+################################################################################
+
+NAME = libftprintf.a
 AR = ar rcs
 
-LIB = libft/libft.a
-NAME = libftprintf.a
+################################################################################
+# Configs
+################################################################################
 
-OBJS =	ft_printf.o	\
-		proc.o		\
-		proc_num.o	\
-		proc_str.o	\
-		padding.o	\
+VERBOSE = true
 
-OBJS_BONUS =
+################################################################################
+# Compiler & Flags
+################################################################################
 
-vpath %.o $(OBJ_DIR)
-vpath %.h $(INC_DIR)
-vpath %.c $(SRC_DIR)
+CC = gcc
 
-default : ${NAME}
+CFLAGS = -Wall -Wextra -Werror
+DFLAGS = -g -fsanitize=address
 
-all : bonus
+################################################################################
+# Folders & Files
+################################################################################
 
-${NAME} : ${OBJS} ${LIB}
-	cp ${LIB} ${NAME}
-	${AR} ${NAME} $(addprefix $(OBJ_DIR)/, $(OBJS))
+BIN_ROOT = bin/
+SRC_ROOT = src/
+INC_ROOT = inc/
+OBJ_ROOT = obj/
+DEP_ROOT = dep/
+TESTS_ROOT = tests/
 
-bonus : ${NAME} ${OBJS_BONUS}
-	${AR} ${NAME} ${OBJS_BONUS}
+DIRS =
 
-%.o : %.c
-	$(CC) ${CFLAGS} -c $< -I $(INC_DIR) -o $(OBJ_DIR)/$@
+SRC_DIRS := $(addprefix ${SRC_ROOT}, ${DIRS})
+OBJ_DIRS := $(addprefix ${OBJ_ROOT}, ${DIRS})
+DEP_DIRS := $(addprefix ${DEP_ROOT}, ${DIRS})
 
-clean :
-	rm -f ${OBJ_DIR}/*
+SRCS := $(foreach dir, ${SRC_DIRS}, $(wildcard ${dir}*.c))
+SRCS +=  $(wildcard ${SRC_ROOT}*.c)
+OBJS := $(subst ${SRC_ROOT}, ${OBJ_ROOT}, ${SRCS:.c=.o})
+DEPS := $(subst ${SRC_ROOT}, ${DEP_ROOT}, ${SRCS:.c=.d})
 
-fclean : clean
-	rm -f ${NAME}
-	rm -f ${LIB}
+TESTS := $(wildcard ${TESTS_ROOT}*.c)
 
-re : fclean all
+INCS := -I ${INC_ROOT}
 
-${LIB} :
-	make all -C libft
-	make clean -C libft
+BINS := ${BIN_ROOT}${NAME}
+TEST := ${TESTS_ROOT}mytest
 
-test : CFLAGS += -g -fsanitize=address
-test : all
-	${CC} ${CFLAGS} tests/main.c -L. -l:libftprintf.a -I inc -o test
+LIBFT_ROOT = libft/
+LIBFT_INC := ${LIBFT_ROOT}inc
+LIBFT = ${LIBFT_ROOT}bin/libft.a
 
-.PHNONY : clean fclean re all debug
+INCS += -I ${LIBFT_INC}
+
+################################################################################
+# VPATHS
+################################################################################
+
+vpath %.o $(OBJ_ROOT)
+vpath %.h $(INC_ROOT)
+vpath %.c $(SRC_DIRS)
+vpath %.d $(DEP_DIRS)
+
+################################################################################
+# Conditions
+################################################################################
+
+ifeq ($(VERBOSE),true)
+	AT =
+else
+	AT = @
+endif
+
+################################################################################
+# Project Target
+################################################################################
+
+all: ${NAME} bonus
+
+${NAME}: ${OBJS} libft
+	${AT}printf "\033[38;5;46m[CREATING LIBFT ARCHIVE]\033[0m\n"
+	${AT}mkdir -p ${BIN_ROOT}
+	${AT}cp ${LIBFT} ${BIN_ROOT}${NAME}
+	${AT}cd ${BIN_ROOT}; ${AR} ${@F} $(addprefix ../, ${OBJS})
+
+bonus:
+
+libft:
+	${AT}make all -C ${LIBFT_ROOT}
+	${AT}make clean -C ${LIBFT_ROOT}
+
+################################################################################
+# Setup Target
+################################################################################
+
+.init:
+	${AT}printf "\033[33m[CREATING FOLDER STRUCTURE]\033[0m\n"
+	${AT}mkdir -p ${BIN_ROOT}
+	${AT}mkdir -p ${DEP_ROOT}
+	${AT}mkdir -p ${INC_ROOT}
+	${AT}mkdir -p ${OBJ_ROOT}
+	${AT}mkdir -p ${SRC_ROOT}
+	${AT}mkdir -p ${TESTS_ROOT}
+	${AT}printf "\033[33m[INITIALIZING GIT REPOSITORY]\033[0m\n"
+	${AT}git init
+	${AT}echo *.o\n*.d\n.vscode\na.out\n.init > .gitignore
+	${AT}touch ${BIN_ROOT}.gitkeep
+	${AT}touch ${DEP_ROOT}.gitkeep
+	${AT}touch ${OBJ_ROOT}.gitkeep
+	${AT}touch $@
+
+################################################################################
+# General Targets
+################################################################################
+
+clean:
+	${AT}printf "\033[38;5;1m[REMOVING OBJECTS]\033[0m\n"
+	${AT}mkdir -p ${OBJ_ROOT}
+	${AT}find ${OBJ_ROOT} -type f -delete 2>/dev/null
+	${AT}make $@ -C ${LIBFT_ROOT}
+
+fclean: clean
+	${AT}printf "\033[38;5;1m[REMOVING BINARIES]\033[0m\n"
+	${AT}mkdir -p ${BIN_ROOT}
+	${AT}find ${BIN_ROOT} -type f -delete
+	${AT}make $@ -C ${LIBFT_ROOT}
+
+clean_dep:
+	${AT}printf "\033[38;5;1m[REMOVING DEPENDENCIES]\033[0m\n"
+	${AT}mkdir -p ${DEP_ROOT}
+	${AT}find ${DEP_ROOT} -type f -delete 2>/dev/null
+	${AT}make $@ -C ${LIBFT_ROOT}
+
+clean_all: clean_dep fclean
+
+re: fclean all
+
+################################################################################
+# Test Targets
+################################################################################
+
+testre: ${CFLAGS} += ${DFLAGS}
+testre: re ${TEST}
+
+testm: ${CFLAGS} += ${DFLAGS}
+testm: ${TEST}
+
+${TEST}:
+	${AT}printf "\033[38;5;46m[GENERATING TEST]\033[0m\n"
+	${AT}${CC} ${CFLAGS} ${INCS} ${TESTS} ${BIN_ROOT}${NAME} -o $@
+	${AT}printf "\033[33m[RUNNING TEST]\033[0m\n"
+	${AT}./$@
+
+################################################################################
+# .PHONY
+################################################################################
+
+.PHONY : clean fclean clean_dep clean_all re all mtest libft
+
+################################################################################
+# Function
+################################################################################
+
+define make_obj
+${1} : ${2} ${3}
+	$${AT}printf "\033[38;5;14m[OBJ]: \033[38;5;47m$$@\033[0m\n"
+	$${AT}mkdir -p $${@D}
+	$${AT}$${CC} $${CFLAGS} $${INCS} -c $$< -o $$@
+endef
+
+define make_dep
+${1} : ${2}
+	$${AT}printf "\033[38;5;13m[DEP]: \033[38;5;47m$$@\033[0m\n"
+	$${AT}mkdir -p $${@D}
+	$${AT}$${CC} -MM $$< $${INCS} -MF $$@
+	$${AT}sed -i.tmp --expression 's|:| $$@ :|' $$@ && rm $$@.tmp
+	$${AT}sed -i.tmp --expression '1 s|^|$${@D}/|' $$@ && rm $$@.tmp
+endef
+
+################################################################################
+# Function Generator
+################################################################################
+
+$(foreach src, $(SRCS), $(eval \
+$(call make_dep, $(subst ${SRC_ROOT}, ${DEP_ROOT}, $(src:.c=.d)), $(src))))
+
+$(foreach src, $(SRCS), $(eval \
+$(call make_obj, $(subst ${SRC_ROOT}, ${OBJ_ROOT}, $(src:.c=.o)), \
+$(src), \
+$(subst ${SRC_ROOT}, ${DEP_ROOT}, $(src:.c=.d)))))
+
+################################################################################
+# Includes
+################################################################################
+
+-include ${DEPS}
