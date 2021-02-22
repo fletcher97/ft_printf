@@ -6,74 +6,74 @@
 /*   By: mgueifao <mgueifao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 19:43:24 by mgueifao          #+#    #+#             */
-/*   Updated: 2021/02/17 15:33:14 by mgueifao         ###   ########.fr       */
+/*   Updated: 2021/02/22 16:24:16 by mgueifao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-# include <stdarg.h>
 
 #include "ft_string.h"
 #include "ft_stdio.h"
 #include "ft_stdlib.h"
+#include "ft_norm.h"
 #include "ft_printf.h"
 
 /*
 ** Same as strtok but doesn't change the original string and return a duplicate
 ** of the token that need to be freed.
 */
+
 static char	*ft_strtok_m(char *str)
 {
-	char		*ret;
 	static char	*curr = NULL;
+	char		*ret;
+	short		searching;
 
-	if (((!curr || !*curr) && !str))
+	if (!curr && !str)
 		return (NULL);
-	curr = str ? str : curr;
+	searching = 1;
+	if (!curr)
+		searching = 0;
+	curr = (char *)ft_ternary64(!!str, (uint64_t)str, (uint64_t)curr);
 	ret = curr;
-	curr++;
-	if (*ret == '%' && *curr == '%')
-	{
+	if (*curr == '%' && searching)
 		ret++;
+	if (*curr == '%' && searching)
+		curr++;
+	while (*curr && (*curr != '%' || searching))
+	{
+		if (ft_strchr(CONVS, *curr))
+			searching = 0;
 		curr++;
 	}
-	else if(*ret == '%')
-		ret++;
-	while (*curr && *curr != '%')
-		curr++;
-	ret = ft_substr(ret, 0, curr - ret);
-	curr = *curr ? curr : NULL;
-	return (*ret ? ret : NULL);
+	curr = (char *)ft_ternary64(!!*curr, (uint64_t)curr, 0);
+	return (ft_substr(ret, 0, curr - ret));
 }
 
-// va_arg(list, int);
 static int	proc(char *s, va_list args)
 {
 	t_fields	*fields;
 	int			ret;
 
-	if (!args || !(fields = ft_malloc(sizeof(t_fields))))
+	if (!args || !(ft_set64((int64_t*)&fields,
+				(uint64_t)ft_malloc(sizeof(t_fields)))))
 		return (-1);
 	s = proc_flags(s, fields);
 	if (fields->flags != -1)
 	{
-		s = proc_width(s, fields);
-		s = proc_precision(s, fields);
+		s = proc_width(s, fields, args);
+		s = proc_precision(s, fields, args);
 		s = proc_length(s, fields);
-		s = proc_conv(s, fields, args);
-		ft_putstr_fd(s, 1);
+		ret = proc_conv(s, fields, args);
 	}
-	ret = ft_strlen(s);
-	ft_free(s);
 	ft_free(fields);
 	return (ret);
 }
 
-int			ft_printf(const char *str, ...)
+int	ft_printf(const char *str, ...)
 {
-	char *s;
-	char *tok;
-	int ret;
-	va_list args;
+	char	*s;
+	char	*tok;
+	int		ret;
+	va_list	args;
 
 	if (!str)
 		return (0);
@@ -81,17 +81,14 @@ int			ft_printf(const char *str, ...)
 	ret = 0;
 	tok = ft_strtok_m(s);
 	va_start(args, str);
-	while(tok)
+	while (tok)
 	{
 		if (*tok == '%' || (!ret && *str != '%'))
-		{
-			ret += ft_strlen(tok);
 			ft_putstr_fd(tok, 1);
-		}
+		if (*tok == '%' || (!ret && *str != '%'))
+			ret += ft_strlen(tok);
 		else
-		{
 			ret += proc(tok, args);
-		}
 		ft_free(tok);
 		tok = ft_strtok_m(NULL);
 	}

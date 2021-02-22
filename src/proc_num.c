@@ -6,67 +6,117 @@
 /*   By: mgueifao <mgueifao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 03:22:12 by mgueifao          #+#    #+#             */
-/*   Updated: 2021/02/17 16:20:11 by mgueifao         ###   ########.fr       */
+/*   Updated: 2021/02/22 16:28:37 by mgueifao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_conv.h"
 #include "ft_stdlib.h"
+#include "ft_stdio.h"
 #include "ft_string.h"
 #include "ft_printf.h"
 
-char	*proc_int(char *s, t_fields *f, int i)
+int	proc_int(char *s, t_fields *f, int i)
 {
-	char *ret;
-	char *temp;
+	int		ret;
+	char	*temp;
 
-	if (!f)
-		return (ft_malloc(0));
 	temp = ft_itoa(i);
 	pad_precision_num(&temp, f->precision);
 	pad_width_num(&temp, f);
-	ret = ft_strjoin(temp, s);
+	if (f->flags & B4 && *temp != ' ' && i >= 0)
+		ft_putchar_fd(' ', STDOUT);
+	ft_putstr_fd(temp, STDOUT);
+	ft_putstr_fd(s, STDOUT);
+	ret = ft_strlen(temp) + ft_strlen(s);
+	if (f->flags & B4 && *temp != ' ' && i >= 0)
+		ret++;
 	ft_free(temp);
 	return (ret);
 }
 
-char	*proc_uint(char *s, t_fields *f, unsigned int i)
+int	proc_uint(char *s, t_fields *f, unsigned int i)
 {
-	char *ret;
-	char *temp;
+	int		ret;
+	char	*temp;
 
-	if (!f)
-		return (ft_malloc(0));
 	temp = ft_uitoa(i);
 	pad_precision_num(&temp, f->precision);
 	pad_width_num(&temp, f);
-	ret = ft_strjoin(temp, s);
+	if (f->flags & B4 && *temp != ' ')
+		ft_putchar_fd(' ', STDOUT);
+	ft_putstr_fd(temp, STDOUT);
+	ft_putstr_fd(s, STDOUT);
+	ret = ft_strlen(temp) + ft_strlen(s);
+	if (f->flags & B4 && *temp != ' ')
+		ret++;
 	ft_free(temp);
 	return (ret);
 }
 
-char	*proc_uhex(char *s, t_fields *f, unsigned int i, short big)
+int	proc_uhex(char *s, t_fields *f, unsigned int i, short big)
 {
-	char *ret;
-	char *temp;
+	int		ret;
+	char	*temp;
 
-	if (!f)
-		return (ft_malloc(0));
 	if (big)
-		temp = ft_itoa_base(i, HEX_U);
+		temp = ft_uitoa_base(i, HEX_U);
 	else
-		temp = ft_itoa_base(i, HEX_L);
+		temp = ft_uitoa_base(i, HEX_L);
 	pad_precision_num(&temp, f->precision);
 	pad_width_num(&temp, f);
-	ret = ft_strjoin(temp, s);
+	if (f->flags & B4 && *temp != ' ')
+		ft_putchar_fd(' ', STDOUT);
+	ft_putstr_fd(temp, STDOUT);
+	ft_putstr_fd(s, STDOUT);
+	ret = ft_strlen(temp) + ft_strlen(s);
+	if (f->flags & B4 && *temp != ' ')
+		ret++;
 	ft_free(temp);
 	return (ret);
-	return (s);
 }
 
-char	*proc_ptr(char *s, t_fields *f, void *ptr)
+int	proc_ptr(char *s, t_fields *f, void *ptr)
 {
-	if (!f || !s || !ptr)
-		return (s);
-	return (s);
+	int		ret;
+	char	*temp;
+	char	*aux;
+
+	if (!ptr)
+	{
+		ft_putstr_fd("(nil)", STDOUT);
+		ft_putstr_fd(s, STDOUT);
+		return (ft_strlen(s) + 5);
+	}
+	else
+		temp = ft_ultoa_base((unsigned long)ptr, HEX_L);
+	aux = ft_strjoin("0x", temp);
+	ft_free(temp);
+	temp = aux;
+	pad_precision_num(&temp, f->precision);
+	pad_width_num(&temp, f);
+	ft_putstr_fd(temp, STDOUT);
+	ft_putstr_fd(s, STDOUT);
+	ret = ft_strlen(temp) + ft_strlen(s);
+	ft_free(temp);
+	return (ret);
+}
+
+int	proc_uoct(char *s, t_fields *f, unsigned int i)
+{
+	int		ret;
+	char	*temp;
+
+	temp = ft_uitoa_base(i, OCT);
+	pad_precision_num(&temp, f->precision);
+	pad_width_num(&temp, f);
+	if (f->flags & B4 && *temp != ' ')
+		ft_putchar_fd(' ', STDOUT);
+	ft_putstr_fd(temp, STDOUT);
+	ft_putstr_fd(s, STDOUT);
+	ret = ft_strlen(temp) + ft_strlen(s);
+	if (f->flags & B4 && *temp != ' ')
+		ret++;
+	ft_free(temp);
+	return (ret);
 }

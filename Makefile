@@ -20,7 +20,8 @@ AR = ar rcs
 # Configs
 ################################################################################
 
-VERBOSE = true
+VERBOSE = false
+MAKEFLAGS += --silent
 
 ################################################################################
 # Compiler & Flags
@@ -49,7 +50,7 @@ OBJ_DIRS := $(addprefix ${OBJ_ROOT}, ${DIRS})
 DEP_DIRS := $(addprefix ${DEP_ROOT}, ${DIRS})
 
 SRCS := $(foreach dir, ${SRC_DIRS}, $(wildcard ${dir}*.c))
-SRCS +=  $(wildcard ${SRC_ROOT}*.c)
+SRCS += $(wildcard ${SRC_ROOT}*.c)
 OBJS := $(subst ${SRC_ROOT}, ${OBJ_ROOT}, ${SRCS:.c=.o})
 DEPS := $(subst ${SRC_ROOT}, ${DEP_ROOT}, ${SRCS:.c=.d})
 
@@ -90,18 +91,18 @@ endif
 ################################################################################
 
 all: ${NAME} bonus
+	cp ${BIN_ROOT}${NAME} ${NAME}
 
-${NAME}: ${OBJS} libft
-	${AT}printf "\033[38;5;46m[CREATING LIBFT ARCHIVE]\033[0m\n"
+${NAME}: ${OBJS} ${LIBFT}
+	${AT}printf "\033[38;5;46m[CREATING LIBFTPRINTF ARCHIVE]\033[0m\n"
 	${AT}mkdir -p ${BIN_ROOT}
 	${AT}cp ${LIBFT} ${BIN_ROOT}${NAME}
 	${AT}cd ${BIN_ROOT}; ${AR} ${@F} $(addprefix ../, ${OBJS})
 
 bonus:
 
-libft:
+${LIBFT}:
 	${AT}make all -C ${LIBFT_ROOT}
-	${AT}make clean -C ${LIBFT_ROOT}
 
 ################################################################################
 # Setup Target
@@ -153,12 +154,23 @@ re: fclean all
 # Test Targets
 ################################################################################
 
-testre: ${CFLAGS} += ${DFLAGS}
-testre: re ${TEST}
+debug: CFLAGS += ${DFLAGS}
+debug: libft_debug all
 
-testm: ${CFLAGS} += ${DFLAGS}
-testm: ${TEST}
+debug_re: fclean debug
 
+libft_debug:
+	${AT}make debug -C ${LIBFT_ROOT}
+
+################################################################################
+# Test Targets
+################################################################################
+
+testre: debug_re ${TEST}
+
+testm: libft_debug debug ${TEST}
+
+${TEST}: CFLAGS += ${DFLAGS}
 ${TEST}:
 	${AT}printf "\033[38;5;46m[GENERATING TEST]\033[0m\n"
 	${AT}${CC} ${CFLAGS} ${INCS} ${TESTS} ${BIN_ROOT}${NAME} -o $@
@@ -169,7 +181,7 @@ ${TEST}:
 # .PHONY
 ################################################################################
 
-.PHONY : clean fclean clean_dep clean_all re all mtest libft
+.PHONY : clean fclean clean_dep clean_all re all testm testre ${LIBFT} ${TEST}
 
 ################################################################################
 # Function

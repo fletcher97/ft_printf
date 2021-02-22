@@ -6,7 +6,7 @@
 /*   By: mgueifao <mgueifao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 19:21:10 by mgueifao          #+#    #+#             */
-/*   Updated: 2021/02/17 16:19:49 by mgueifao         ###   ########.fr       */
+/*   Updated: 2021/02/22 14:30:32 by mgueifao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,14 @@
 # define B7 0x40
 # define B8 0x80
 
-# define FLAGS "-0*"
+# define FLAGS "-0* "
+# define CONVS "%cdixXspu"
 
-# define HEX_L "0123456789abcdef"
-# define HEX_U "0123456789ABCDEF"
-
-typedef struct	s_fields
+typedef struct s_fields
 {
-	char flags;
-	int width;
-	int precision;
+	char	flags;
+	int		width;
+	int		precision;
 }				t_fields;
 
 /*
@@ -51,18 +49,21 @@ typedef struct	s_fields
 int		ft_printf(const char *str, ...);
 
 char	*proc_flags(char *s, t_fields *f);
-char	*proc_width(char *s, t_fields *f);
-char	*proc_precision(char *s, t_fields *f);
+char	*proc_width(char *s, t_fields *f, va_list args);
+char	*proc_precision(char *s, t_fields *f, va_list args);
 char	*proc_length(char *s, t_fields *f);
-char	*proc_conv(char *s, t_fields *f, va_list args);
+int		proc_conv(char *s, t_fields *f, va_list args);
 
-char	*proc_char(char *s, t_fields *f, char c);
-char	*proc_str(char *s, t_fields *f, char *str);
-char	*proc_ptr(char *s, t_fields *f, void *ptr);
-char	*proc_int(char *s, t_fields *f, int i);
-char	*proc_uint(char *s, t_fields *f, unsigned int i);
-char	*proc_uhex(char *s, t_fields *f, unsigned int i, short big);
+int		proc_char(char *s, t_fields *f, char c);
+int		proc_str(char *s, t_fields *f, char *str);
+int		proc_ptr(char *s, t_fields *f, void *ptr);
+int		proc_int(char *s, t_fields *f, int i);
+int		proc_uint(char *s, t_fields *f, unsigned int i);
+int		proc_uhex(char *s, t_fields *f, unsigned int i, short big);
+int		proc_uoct(char *s, t_fields *f, unsigned int i);
 
+void	pad_precision_str(char **str, int width);
+void	pad_width_str(char **str, t_fields *f);
 void	pad_width_num(char **str, t_fields *f);
 void	pad_precision_num(char **str, int width);
 
