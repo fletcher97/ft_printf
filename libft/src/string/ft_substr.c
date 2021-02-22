@@ -6,7 +6,7 @@
 /*   By: mgueifao <mgueifao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 01:23:39 by mgueifao          #+#    #+#             */
-/*   Updated: 2021/02/17 14:28:54 by mgueifao         ###   ########.fr       */
+/*   Updated: 2021/02/19 18:39:27 by mgueifao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	size = ft_ternary64(size > len, len, size);
 	if (!ft_set64((int64_t *)&ret, (int64_t)ft_malloc(size + 1)))
 		return (NULL);
-	strncpy(ret, s + start, size);
+	ft_strncpy(ret, s + start, size);
 	ret[size] = '\0';
 	return (ret);
 }
