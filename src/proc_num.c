@@ -6,13 +6,14 @@
 /*   By: mgueifao <mgueifao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 03:22:12 by mgueifao          #+#    #+#             */
-/*   Updated: 2021/02/22 16:28:37 by mgueifao         ###   ########.fr       */
+/*   Updated: 2021/07/19 22:08:24 by mgueifao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_conv.h"
 #include "ft_stdlib.h"
 #include "ft_stdio.h"
+#include "ft_norm.h"
 #include "ft_string.h"
 #include "ft_printf.h"
 
@@ -20,16 +21,23 @@ int	proc_int(char *s, t_fields *f, int i)
 {
 	int		ret;
 	char	*temp;
+	char	*aux;
 
 	temp = ft_itoa(i);
 	pad_precision_num(&temp, f->precision);
+	if (f->flags & B5 && i >= 0)
+	{
+		aux = ft_strjoin("+", temp);
+		ft_free(temp);
+		temp = aux;
+	}
 	pad_width_num(&temp, f);
-	if (f->flags & B4 && *temp != ' ' && i >= 0)
+	if (f->flags & B4 && !(f->flags & B5) && *temp != ' ' && i >= 0)
 		ft_putchar_fd(' ', STDOUT);
 	ft_putstr_fd(temp, STDOUT);
 	ft_putstr_fd(s, STDOUT);
 	ret = ft_strlen(temp) + ft_strlen(s);
-	if (f->flags & B4 && *temp != ' ' && i >= 0)
+	if (f->flags & B4 && !(f->flags & B5) && *temp != ' ' && i >= 0)
 		ret++;
 	ft_free(temp);
 	return (ret);
@@ -58,12 +66,19 @@ int	proc_uhex(char *s, t_fields *f, unsigned int i, short big)
 {
 	int		ret;
 	char	*temp;
+	char	*aux;
 
 	if (big)
-		temp = ft_uitoa_base(i, HEX_U);
+		aux = ft_uitoa_base(i, HEX_U);
 	else
-		temp = ft_uitoa_base(i, HEX_L);
-	pad_precision_num(&temp, f->precision);
+		aux = ft_uitoa_base(i, HEX_L);
+	pad_precision_num(&aux, f->precision);
+	if (f->flags & B6 && i > 0)
+		temp = ft_strjoin((char *)ft_ternary64(big,
+			(int64_t)"0X", (int64_t)"0x"), aux);
+	else
+		temp = ft_strdup(aux);
+	ft_free(aux);
 	pad_width_num(&temp, f);
 	if (f->flags & B4 && *temp != ' ')
 		ft_putchar_fd(' ', STDOUT);

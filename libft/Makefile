@@ -37,8 +37,8 @@ VERBOSE = 1
 
 CC = gcc
 
-CFLAGS = -Wall -Wextra -Werror
-DFLAGS = -g -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -g
+# DFLAGS = -g -fsanitize=address
 
 ################################################################################
 # Folders & Files

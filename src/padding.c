@@ -6,7 +6,7 @@
 /*   By: mgueifao <mgueifao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/07 07:32:57 by mgueifao          #+#    #+#             */
-/*   Updated: 2021/02/22 14:23:19 by mgueifao         ###   ########.fr       */
+/*   Updated: 2021/07/19 21:16:19 by mgueifao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,9 @@ void	pad_precision_num(char **str, int width)
 			return ;
 	if (width || **str != '0')
 	{
-		if ((int)ft_strlen(*str) >= width || !ft_set64((int64_t*)&ret,
-						(int64_t)ft_calloc(width + 1, sizeof(char))))
+		if ((**str != '-' && (int)ft_strlen(*str) >= width) || (**str == '-' &&
+				(int)ft_strlen(*str) > width) || !ft_set64((int64_t*)&ret,
+				(int64_t)ft_calloc(width + 2, sizeof(char))))
 			return ;
 		if (**str == '-')
 		{

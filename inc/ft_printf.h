@@ -6,7 +6,7 @@
 /*   By: mgueifao <mgueifao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 19:21:10 by mgueifao          #+#    #+#             */
-/*   Updated: 2021/02/22 14:30:32 by mgueifao         ###   ########.fr       */
+/*   Updated: 2021/07/19 21:45:15 by mgueifao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 # define B7 0x40
 # define B8 0x80
 
-# define FLAGS "-0* "
+# define FLAGS "-0* +#"
 # define CONVS "%cdixXspu"
 
 typedef struct s_fields
