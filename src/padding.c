@@ -102,7 +102,7 @@ void	pad_width_num(char **str, t_fields *f)
 	char	pad;
 	char	*ret;
 
-	if ((int)ft_strlen(*str) >= f->width || !ft_set64((int64_t*)&ret,
+	if ((int)ft_strlen(*str) >= f->width || !ft_set64((int64_t *)&ret,
 			(int64_t)ft_calloc(f->width + 1, sizeof(char))))
 		return ;
 	pad = ft_ternary8(f->precision == -1 && f->flags & B2, '0', ' ');
