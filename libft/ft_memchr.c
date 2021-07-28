@@ -17,7 +17,7 @@ void	*ft_memchr(const void *s, int c, size_t n)
 	t_uc	*p;
 	size_t	i;
 
-	p = (t_uc*)s;
+	p = (t_uc *)s;
 	i = 0;
 	while (i < n)
 	{

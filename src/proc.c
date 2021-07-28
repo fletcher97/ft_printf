@@ -94,9 +94,9 @@ int	proc_conv(char *s, t_fields *f, va_list args)
 	if (*s == 'c')
 		return (proc_char(++s, f, (char)va_arg(args, int)));
 	if (*s == 's')
-		return (proc_str(++s, f, (char*)va_arg(args, char*)));
+		return (proc_str(++s, f, (char *)va_arg(args, char *)));
 	if (*s == 'p')
-		return (proc_ptr(++s, f, (void *)va_arg(args, void*)));
+		return (proc_ptr(++s, f, (void *)va_arg(args, void *)));
 	if (*s == 'd' || *s == 'i')
 		return (proc_int(++s, f, (int)va_arg(args, int)));
 	if (*s == 'u')

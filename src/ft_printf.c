@@ -53,7 +53,7 @@ static int	proc(char *s, va_list args)
 	t_fields	*fields;
 	int			ret;
 
-	if (!args || !(ft_set64((int64_t*)&fields,
+	if (!args || !(ft_set64((int64_t *)&fields,
 				(uint64_t)ft_malloc(sizeof(t_fields)))))
 		return (-1);
 	s = proc_flags(s, fields);

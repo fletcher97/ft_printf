@@ -13,7 +13,7 @@
 #ifndef FT_STDLIB_H
 # define FT_STDLIB_H
 
-#include <stddef.h>
+# include <stddef.h>
 
 int		ft_abs(int x);
 int		ft_atoi(const char *str);

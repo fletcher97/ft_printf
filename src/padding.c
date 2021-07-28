@@ -23,7 +23,7 @@ void	pad_precision_str(char **str, int width)
 		return ;
 	if (!width)
 	{
-		if (!ft_set64((int64_t*)&ret, (int64_t)ft_calloc(1, sizeof(char))))
+		if (!ft_set64((int64_t *)&ret, (int64_t)ft_calloc(1, sizeof(char))))
 			return ;
 	}
 	else
@@ -38,7 +38,7 @@ void	pad_width_str(char **str, t_fields *f)
 
 	if (f->width < 0 || f->width < (int)ft_strlen(*str))
 		return ;
-	if (!ft_set64((int64_t*)&ret,
+	if (!ft_set64((int64_t *)&ret,
 			(int64_t)ft_calloc(f->width + 1, sizeof(char))))
 		return ;
 	ft_memset(ret, ' ', f->width);
@@ -55,12 +55,12 @@ void	pad_precision_num(char **str, int width)
 	char	*ret;
 
 	if (!width && **str == '0')
-		if (!ft_set64((int64_t*)&ret, (int64_t)ft_calloc(1, sizeof(char))))
+		if (!ft_set64((int64_t *)&ret, (int64_t)ft_calloc(1, sizeof(char))))
 			return ;
 	if (width || **str != '0')
 	{
-		if ((**str != '-' && (int)ft_strlen(*str) >= width) || (**str == '-' &&
-				(int)ft_strlen(*str) > width) || !ft_set64((int64_t*)&ret,
+		if ((**str != '-' && (int)ft_strlen(*str) >= width) || (**str == '-'
+				&& (int)ft_strlen(*str) > width) || !ft_set64((int64_t*)&ret,
 				(int64_t)ft_calloc(width + 2, sizeof(char))))
 			return ;
 		if (**str == '-')
@@ -92,7 +92,7 @@ static void	stupid_func_bc_norm(char **str, char pad, char *ret, t_fields *f)
 		ft_memset(ret, pad, f->width - ft_strlen(*str));
 	if (**str == '-' && pad == '0')
 		ft_memcpy(ret + 1 + f->width - ft_strlen(*str),
-				 *str + 1, ft_strlen(*str) - 1);
+			*str + 1, ft_strlen(*str) - 1);
 	else
 		ft_memcpy(ret + f->width - ft_strlen(*str), *str, ft_strlen(*str));
 }
@@ -103,7 +103,7 @@ void	pad_width_num(char **str, t_fields *f)
 	char	*ret;
 
 	if ((int)ft_strlen(*str) >= f->width || !ft_set64((int64_t*)&ret,
-					(int64_t)ft_calloc(f->width + 1, sizeof(char))))
+			(int64_t)ft_calloc(f->width + 1, sizeof(char))))
 		return ;
 	pad = ft_ternary8(f->precision == -1 && f->flags & B2, '0', ' ');
 	if (f->flags & B1)

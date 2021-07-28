@@ -75,7 +75,7 @@ int	proc_uhex(char *s, t_fields *f, unsigned int i, short big)
 	pad_precision_num(&aux, f->precision);
 	if (f->flags & B6 && i > 0)
 		temp = ft_strjoin((char *)ft_ternary64(big,
-			(int64_t)"0X", (int64_t)"0x"), aux);
+					(int64_t)"0X", (int64_t)"0x"), aux);
 	else
 		temp = ft_strdup(aux);
 	ft_free(aux);
@@ -97,14 +97,7 @@ int	proc_ptr(char *s, t_fields *f, void *ptr)
 	char	*temp;
 	char	*aux;
 
-	if (!ptr)
-	{
-		ft_putstr_fd("(nil)", STDOUT);
-		ft_putstr_fd(s, STDOUT);
-		return (ft_strlen(s) + 5);
-	}
-	else
-		temp = ft_ultoa_base((unsigned long)ptr, HEX_L);
+	temp = ft_ultoa_base((unsigned long)ptr, HEX_L);
 	aux = ft_strjoin("0x", temp);
 	ft_free(temp);
 	temp = aux;

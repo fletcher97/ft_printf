@@ -20,8 +20,8 @@ int	ft_memcmp(const void *s1, const void *s2, size_t n)
 
 	if (!n)
 		return (0);
-	c1 = (t_uc*)s1;
-	c2 = (t_uc*)s2;
+	c1 = (t_uc *)s1;
+	c2 = (t_uc *)s2;
 	i = 0;
 	while (i < n && c1[i] == c2[i])
 		i++;

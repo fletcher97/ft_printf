@@ -23,7 +23,7 @@ int	proc_str(char *s, t_fields *f, char *str)
 	short	flag;
 
 	flag = 0;
-	if (!str && ft_set8((int8_t*)&temp, 1))
+	if (!str && ft_set8((int8_t *)&temp, 1))
 	{
 		if (f->precision < 0 || f->precision > 5)
 			str = ft_malloc(7);
@@ -49,7 +49,7 @@ static int	stupid_func_bc_norm(char *temp, int ret)
 {
 	char	*aux;
 
-	ft_set64((int64_t*)&aux, (int64_t)ft_substr(temp, 0, ft_strichr(temp, 1)));
+	ft_set64((int64_t *)&aux, (int64_t)ft_substr(temp, 0, ft_strichr(temp, 1)));
 	ft_putstr_fd(aux, STDOUT);
 	ft_free(aux);
 	ft_putchar_fd('\0', STDOUT);
