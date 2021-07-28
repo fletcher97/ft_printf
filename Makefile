@@ -77,8 +77,8 @@ SRC_ROOT := src/
 
 # Libft
 LIBFT_ROOT := ${LIB_ROOT}libft/
-LIBFT_INC := ${LIBFT_ROOT}inc/
-LIBFT := ${LIBFT_ROOT}bin/libft.a
+LIBFT_INC := ${LIBFT_ROOT}./
+LIBFT := ${LIBFT_ROOT}./libft.a
 
 INC_DIRS += ${LIBFT_INC}
 LIBS += -L${LIBFT_ROOT}bin -lft

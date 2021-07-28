@@ -2,19 +2,30 @@
 # Makefile
 ################################################################################
 
-# Makefile by fletcher
-# Version: 1.2
+# Makefile by fletcher97
+# Version: 2.1
 
 # This makefile can be copied to a directory and it will generate the file
 # structure and initialize a git repository with the .init rule. Any variables
 # and rules for the specifique project can be added in the appropriate section.
 
+# By default this makefile assumes that libft, 42's student made library, a copy
+# of which can be obtained by cloning https://github.com/fletcher97/libft.git,
+# is being used. It can be removed by simply commenting any reference to it on
+# the library section.
+
 ################################################################################
 # Project Variables
 ################################################################################
 
-NAME = libft.a
-AR = ar rcs
+# Name of a single binary. Add as many variables as required by the project
+NAME1 := libft.a
+
+# The names of all the binaries. Add aditional variables created above separated
+# by space.
+NAMES := ${NAME1}
+
+AR := ar rcs
 
 ################################################################################
 # Configs
@@ -29,45 +40,131 @@ AR = ar rcs
 #
 # If no value is specified or an incorrect value is given make will print each
 # command like if VERBOSE was set to 3.
-VERBOSE = 1
+VERBOSE := 1
+
+# Version 2.1 and above of this makefile can generate targets to use other
+# makefiles as dependencies. This feature will execute the rule of same name in
+# an other makefile. This can be usefull in many situation but also a hinderence
+# in others. If for example you just want to clean the root directory the clean
+# rule will be executed in any other makefile specified. You can deactivate the
+# creation of these targets by setting the bellow variable to 0.
+CREATE_LIB_TARGETS := 1
 
 ################################################################################
 # Compiler & Flags
 ################################################################################
 
-CC = gcc
+CC := gcc
 
-CFLAGS = -Wall -Wextra -Werror -g
-# DFLAGS = -g -fsanitize=address
+CFLAGS := -Wall -Wextra -Werror -Wvla
+DFLAGS := -g
+SANITIZE := -fsanitize=address
 
 ################################################################################
-# Folders & Files
+# Root Folders
 ################################################################################
 
-BIN_ROOT = bin/
-SRC_ROOT = src/
-INC_ROOT = inc/
-OBJ_ROOT = obj/
-DEP_ROOT = dep/
-TESTS_ROOT = tests/
+BIN_ROOT := ./
+DEP_ROOT := ./
+INC_ROOT := ./
+LIB_ROOT := ./
+OBJ_ROOT := ./
+SRC_ROOT := ./
 
-DIRS = ctype/ list/ norm/ stdio/ stdlib/ string/ conv/
+################################################################################
+# Libraries
+################################################################################
 
-SRC_DIRS := $(addprefix ${SRC_ROOT}, ${DIRS})
-OBJ_DIRS := $(addprefix ${OBJ_ROOT}, ${DIRS})
-DEP_DIRS := $(addprefix ${DEP_ROOT}, ${DIRS})
+# Libft
+#LIBFT_ROOT := ${LIB_ROOT}libft/
+#LIBFT_INC := ${LIBFT_ROOT}inc/
+#LIBFT := ${LIBFT_ROOT}bin/libft.a
 
-SRCS := $(foreach dir, ${SRC_DIRS}, $(wildcard ${dir}*.c))
-SRCS += $(wildcard ${SRC_ROOT}*.c)
-OBJS := $(subst ${SRC_ROOT}, ${OBJ_ROOT}, ${SRCS:.c=.o})
-DEPS := $(subst ${SRC_ROOT}, ${DEP_ROOT}, ${SRCS:.c=.d})
+#INC_DIRS += ${LIBFT_INC}
+#LIBS += -L${LIBFT_ROOT}bin -lft
 
-TESTS := $(wildcard ${TESTS_ROOT}*.c)
+# Libraries for which to create default targets. All libraries in this list will
+# have targets created autimatically. The targets that are created are set in
+# DEFAULT_LIB_RULES. The targets will have to format <library root>//<target>
+# and it will invoke make as follows:
+# `make -C <library root> <rule>`
+#DEFAULT_LIBS := ${LIBFT_ROOT}
 
-INCS := -I ${INC_ROOT}
+# Default targets to create for libraries specified in DEFAULT_LIBS. This is a
+# small list of common targets in most makefiles.
+DEFAULT_LIB_RULES := all clean re
 
-BINS := ${BIN_ROOT}${NAME}
-TEST := ${TESTS_ROOT}mytest
+# All projects with a copy of this makefile v2.1 and up ate garanteed to work
+# with these targets. If you wish to not use them just comment the lines you
+# don't want.
+DEFAULT_LIB_RULES += fclean clean_all clean_dep
+DEFAULT_LIB_RULES += debug debug_re debug_asan debug_asan_re
+
+################################################################################
+# Content Folders
+################################################################################
+
+# Lists of ':' separated folders inside SRC_ROOT containing source files. Each
+# folder needs to end with a '/'. The path to the folders is relative to
+# SRC_ROOTIf SRC_ROOT contains files './' needs to be in the list. Each list is
+# separated by a space or by going to a new line and adding onto the var.
+# Exemple:
+# DIRS := folder1/:folder2/
+# DIRS += folder1/:folder3/:folder4/
+DIRS := ./
+
+SRC_DIRS_LIST := $(addprefix ${SRC_ROOT},${DIRS})
+SRC_DIRS_LIST := $(foreach dl,${SRC_DIRS_LIST},$(subst :,:${SRC_ROOT},${dl}))
+
+SRC_DIRS = $(call rmdup,$(subst :,${SPACE},${SRC_DIRS_LIST}))
+OBJ_DIRS = $(subst ${SRC_ROOT},${OBJ_ROOT},${SRC_DIRS})
+DEP_DIRS = $(subst ${SRC_ROOT},${DEP_ROOT},${SRC_DIRS})
+
+# List of folders with header files.Each folder needs to end with a '/'. The
+# path to the folders is relative to the root of the makefile. Library includes
+# can be specified here.
+INC_DIRS += ${INC_ROOT}
+
+################################################################################
+# Files
+################################################################################
+
+SRCS_LIST = $(foreach dl,${SRC_DIRS_LIST},$(subst ${SPACE},:,$(strip $(foreach\
+	dir,$(subst :,${SPACE},${dl}),$(wildcard ${dir}*.c)))))
+OBJS_LIST = $(subst ${SRC_ROOT},${OBJ_ROOT},$(subst .c,.o,${SRCS_LIST}))
+
+SRCS = $(foreach dir,${SRC_DIRS},$(wildcard ${dir}*.c))
+OBJS = $(subst ${SRC_ROOT},${OBJ_ROOT},${SRCS:.c=.o})
+DEPS = $(subst ${SRC_ROOT},${DEP_ROOT},${SRCS:.c=.d})
+
+INCS := ${addprefix -I,${INC_DIRS}}
+
+BINS := ${addprefix ${BIN_ROOT},${NAMES}}
+
+################################################################################
+# Conditions
+################################################################################
+
+ifeq ($(shell uname),Linux)
+	SED := sed -i.tmp --expression
+else ifeq ($(shell uname),Darwin)
+	SED := sed -i.tmp
+endif
+
+ifeq ($(VERBOSE),0)
+	MAKEFLAGS += --silent
+	BLOCK := &>/dev/null
+else ifeq ($(VERBOSE),1)
+	MAKEFLAGS += --silent
+else ifeq ($(VERBOSE),2)
+	AT := @
+else ifeq ($(VERBOSE),4)
+	MAKEFLAGS += --debug=v
+endif
+
+ifeq (${CREATE_LIB_TARGETS},0)
+	undefine DEFAULT_LIBS
+endif
 
 ################################################################################
 # VPATHS
@@ -79,74 +176,40 @@ vpath %.c $(SRC_DIRS)
 vpath %.d $(DEP_DIRS)
 
 ################################################################################
-# Conditions
-################################################################################
-
-ifeq ($(VERBOSE),0)
-	MAKEFLAGS += --silent
-	BLOCK = >/dev/null
-else ifeq ($(VERBOSE),1)
-	MAKEFLAGS += --silent
-else ifeq ($(VERBOSE),2)
-	AT = @
-else ifeq ($(VERBOSE),4)
-	MAKEFLAGS += --debug=v
-endif
-
-maketest:
-	${AT}printf "\033[38;5;46m[CREATING abc ARCHIVE]\033[0m\n" ${BLOCK}
-
-################################################################################
 # Project Target
 ################################################################################
 
 all: ${BINS}
 
-${BINS}: ${OBJS}
-	${AT}printf "\033[38;5;46m[CREATING LIBFT ARCHIVE]\033[0m\n" ${BLOCK}
-	${AT}mkdir -p ${BIN_ROOT}
-	${AT}cd ${BIN_ROOT}; ${AR} ${@F} $(addprefix ../, ${OBJS})
+.SECONDEXPANSION:
+${BIN_ROOT}${NAME1}: $$(call get_files,$${@F},$${OBJS_LIST})
+	${AT}printf "\033[33m[CREATING ${@F}]\033[0m\n" ${BLOCK}
+	${AT}${AR} $@ $? ${BLOCK}
 
 ################################################################################
-# Setup Target
+# Clean Targets
 ################################################################################
 
-.init:
-	${AT}printf "\033[33m[CREATING FOLDER STRUCTURE]\033[0m\n" ${BLOCK}
-	${AT}mkdir -p ${BIN_ROOT}
-	${AT}mkdir -p ${DEP_ROOT}
-	${AT}mkdir -p ${INC_ROOT}
-	${AT}mkdir -p ${OBJ_ROOT}
-	${AT}mkdir -p ${SRC_ROOT}
-	${AT}mkdir -p ${TESTS_ROOT}
-	${AT}printf "\033[33m[INITIALIZING GIT REPOSITORY]\033[0m\n" ${BLOCK}
-	${AT}git init
-	${AT}echo *.o\n*.d\n.vscode\na.out\n.init > .gitignore
-	${AT}touch ${BIN_ROOT}/.gitkeep
-	${AT}touch ${DEP_ROOT}/.gitkeep
-	${AT}touch ${OBJ_ROOT}/.gitkeep
-	${AT}touch $@
-
-################################################################################
-# General Targets
-################################################################################
-
-clean:
+clean: $$(call get_lib_target,$${DEFAULT_LIBS},$$@)
 	${AT}printf "\033[38;5;1m[REMOVING OBJECTS]\033[0m\n" ${BLOCK}
-	${AT}mkdir -p ${OBJ_ROOT}
-	${AT}find ${OBJ_ROOT} -type f -delete 2>/dev/null
+	${AT}mkdir -p ${OBJ_ROOT} ${BLOCK}
+	${AT}find ${OBJ_ROOT} -type f -name "*.o" -delete ${BLOCK}
 
-fclean: clean
+fclean: $$(call get_lib_target,$${DEFAULT_LIBS},$$@)
+	${AT}printf "\033[38;5;1m[REMOVING OBJECTS]\033[0m\n" ${BLOCK}
+	${AT}mkdir -p ${OBJ_ROOT} ${BLOCK}
+	${AT}find ${OBJ_ROOT} -type f -name "*.o" -delete ${BLOCK}
 	${AT}printf "\033[38;5;1m[REMOVING BINARIES]\033[0m\n" ${BLOCK}
-	${AT}mkdir -p ${BIN_ROOT}
-	${AT}find ${BIN_ROOT} -type f -delete
+	${AT}mkdir -p ${BIN_ROOT} ${BLOCK}
+	${AT}find ${BIN_ROOT} -type f\
+		$(addprefix -name ,${NAMES}) -delete ${BLOCK}
 
-clean_dep:
+clean_dep: $$(call get_lib_target,$${DEFAULT_LIBS},$$@)
 	${AT}printf "\033[38;5;1m[REMOVING DEPENDENCIES]\033[0m\n" ${BLOCK}
-	${AT}mkdir -p ${DEP_ROOT}
-	${AT}find ${DEP_ROOT} -type f -delete 2>/dev/null
+	${AT}mkdir -p ${DEP_ROOT} ${BLOCK}
+	${AT}find ${DEP_ROOT} -type f -name "*.d" -delete ${BLOCK}
 
-clean_all: clean_dep fclean
+clean_all: fclean clean_dep
 
 re: fclean all
 
@@ -155,62 +218,143 @@ re: fclean all
 ################################################################################
 
 debug: CFLAGS += ${DFLAGS}
-debug: all
+debug: $$(call get_lib_target,$${DEFAULT_LIBS},$$@) all
+
+debug_asan: CFLAGS += ${DFLAGS} ${SANITIZE}
+debug_asan: $$(call get_lib_target,$${DEFAULT_LIBS},$$@) all
 
 debug_re: fclean debug
 
+debug_asan_re: fclean debug_asan
+
 ################################################################################
-# Test Targets
+# Utility Targets
 ################################################################################
 
-testre: debug_re ${TEST}
+.init:
+	${AT}printf "\033[33m[CREATING FOLDER STRUCTURE]\033[0m\n" ${BLOCK}
+	${AT}mkdir -p ${BIN_ROOT} ${BLOCK}
+	${AT}mkdir -p ${DEP_ROOT} ${BLOCK}
+	${AT}mkdir -p ${INC_ROOT} ${BLOCK}
+	${AT}mkdir -p ${OBJ_ROOT} ${BLOCK}
+	${AT}mkdir -p ${SRC_ROOT} ${BLOCK}
+	${AT}mkdir -p ${TESTS_ROOT} ${BLOCK}
+	${AT}printf "\033[33m[INITIALIZING GIT REPOSITORY]\033[0m\n" ${BLOCK}
+	${AT}git init ${BLOCK}
+	${AT}echo "*.o\n*.d\n.vscode\na.out\n.DS_Store" > .gitignore ${BLOCK}
+	${AT}date > $@ ${BLOCK}
+	${AT}printf "\033[33m[CREATING FIRST COMMIT]\033[0m\n" ${BLOCK}
+	${AT}git add .gitignore ${BLOCK}
+	${AT}git add $@ ${BLOCK}
+	${AT}git add Makefile ${BLOCK}
+	${AT}git commit -m "init" ${BLOCK}
 
-testm: debug ${TEST}
+# Meta target to force a target to be executed
+.FORCE: ;
 
-${TEST}: CFLAGS += ${DFLAGS}
-${TEST}:
-	${AT}printf "\033[38;5;46m[GENERATING TEST]\033[0m\n" ${BLOCK}
-	${AT}${CC} ${CFLAGS} ${INCS} ${TESTS} ${BIN_ROOT}/${NAME} -o $@
-	${AT}printf "\033[33m[RUNNING TEST]\033[0m\n" ${BLOCK}
-	${AT}./$@
+# List all the targets in alphabetical order
+targets:
+	${AT}${MAKE} LC_ALL=C -pRrq -f ${CURRENT_FILE} : 2>/dev/null\
+		| awk -v RS= -F: '/^# File/,/^# files hash-table stats/\
+			{if ($$1 !~ "^[#]") {print $$1}}\
+			{if ($$1 ~ "# makefile") {print $$2}}'\
+		| sort
 
 ################################################################################
 # .PHONY
 ################################################################################
 
-.PHONY : clean fclean clean_dep clean_all re all testre testm ${TEST}
+# Phony clean targets
+.PHONY: clean fclean clean_dep clean_all
+
+# Phony debug targets
+.PHONY: debug debug_re debug_asan debug_asan_re
+
+# Phony utility targets
+.PHONY: targets .FORCE
+
+# Phony execution targets
+.PHONY: re all
 
 ################################################################################
-# Function
+# Constantes
 ################################################################################
 
-define make_obj
-${1} : ${2} ${3}
-	$${AT}printf "\033[38;5;14m[OBJ]: \033[38;5;47m$$@\033[0m\n" ${BLOCK}
-	$${AT}mkdir -p $${@D}
-	$${AT}$${CC} $${CFLAGS} $${INCS} -c $$< -o $$@
+NULL =
+SPACE = ${NULL} #
+CURRENT_FILE = ${MAKEFILE_LIST}
+
+################################################################################
+# Functions
+################################################################################
+
+# Get the index of a given word in a list
+_index = $(if $(findstring $1,$2),$(call _index,$1,\
+	$(wordlist 2,$(words $2),$2),x $3),$3)
+index = $(words $(call _index,$1,$2))
+
+# Get value at the same index
+lookup = $(word $(call index,$1,$2),$3)
+
+# Remove duplicates
+rmdup = $(if $1,$(firstword $1) $(call rmdup,$(filter-out $(firstword $1),$1)))
+
+# Get files for a specific binary
+get_files = $(subst :,${SPACE},$(call lookup,$1,${NAMES},$2))
+
+# Get default target for libs given a rule
+get_lib_target = $(foreach lib,$1,${lib}/$2)
+
+################################################################################
+# Target Templates
+################################################################################
+
+define make_bin_def
+${1}: ${2}
 endef
 
-define make_dep
-${1} : ${2}
-	$${AT}printf "\033[38;5;13m[DEP]: \033[38;5;47m$$@\033[0m\n" ${BLOCK}
-	$${AT}mkdir -p $${@D}
-	$${AT}$${CC} -MM $$< -I $${INC_ROOT} -MF $$@
-	$${AT}sed -i.tmp --expression 's|:| $$@ :|' $$@ && rm $$@.tmp
-	$${AT}sed -i.tmp --expression '1 s|^|$${@D}/|' $$@ && rm $$@.tmp
+define make_obj_def
+${1}: ${2} ${3}
+	$${AT}printf "\033[38;5;14m[OBJ]: \033[38;5;47m$$@\033[0m\n" $${BLOCK}
+	$${AT}mkdir -p $${@D} $${BLOCK}
+	$${AT}$${CC} $${CFLAGS} $${INCS} -c $$< -o $$@ $${BLOCK}
+endef
+
+define make_dep_def
+${1}: ${2}
+	$${AT}printf "\033[38;5;13m[DEP]: \033[38;5;47m$$@\033[0m\n" $${BLOCK}
+	$${AT}mkdir -p $${@D} $${BLOCK}
+	$${AT}$${CC} -MM $$< $${INCS} -MF $$@ $${BLOCK}
+	$${AT}$${SED} 's|:| $$@ :|' $$@ $${SED_END} $${BLOCK}
+	$${AT}$${SED} '1 s|^|$${@D}/|' $$@ && rm -f $$@.tmp $${BLOCK}
+	$${AT}$${SED} '1 s|^$${DEP_ROOT}|$${OBJ_ROOT}|' $$@\
+		&& rm -f $$@.tmp $${BLOCK}
+endef
+
+define make_lib_def
+${1}/${2}: .FORCE
+	make -C ${1} ${2}
 endef
 
 ################################################################################
-# Function Generator
+# Target Generator
 ################################################################################
 
-$(foreach src, $(SRCS), $(eval \
-$(call make_dep, $(subst ${SRC_ROOT}, ${DEP_ROOT}, $(src:.c=.d)), $(src))))
+ifneq (${BIN_ROOT},./)
+	$(foreach bin,${BINS},$(eval\
+	$(call make_bin_def,$(notdir ${bin}),${bin})))
+endif
 
-$(foreach src, $(SRCS), $(eval \
-$(call make_obj, $(subst ${SRC_ROOT}, ${OBJ_ROOT}, $(src:.c=.o)), \
-$(src), \
-$(subst ${SRC_ROOT}, ${DEP_ROOT}, $(src:.c=.d)))))
+$(foreach src,${SRCS},$(eval\
+$(call make_dep_def,$(subst ${SRC_ROOT},${DEP_ROOT},${src:.c=.d}),${src})))
+
+$(foreach src,${SRCS},$(eval\
+$(call make_obj_def,$(subst ${SRC_ROOT},${OBJ_ROOT},${src:.c=.o}),\
+${src},\
+$(subst ${SRC_ROOT},${DEP_ROOT},${src:.c=.d}))))
+
+$(foreach lib,${DEFAULT_LIBS},$(foreach target,${DEFAULT_LIB_RULES},$(eval\
+$(call make_lib_def,${lib},${target}))))
 
 ################################################################################
 # Includes
