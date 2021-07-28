@@ -19,7 +19,7 @@
 ################################################################################
 
 # Name of a single binary. Add as many variables as required by the project
-NAME1 := libprintf.a
+NAME1 := libftprintf.a
 
 # The names of all the binaries. Add aditional variables created above separated
 # by space.
@@ -180,6 +180,8 @@ vpath %.d $(DEP_DIRS)
 ################################################################################
 
 all: ${BINS}
+
+bonus: ${BINS}
 
 .SECONDEXPANSION:
 ${BIN_ROOT}${NAME1}: ${LIBFT} $$(call get_files,$${@F},$${OBJS_LIST})
