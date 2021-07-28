@@ -57,6 +57,7 @@ static int	proc(char *s, va_list args)
 				(uint64_t)ft_malloc(sizeof(t_fields)))))
 		return (-1);
 	s = proc_flags(s, fields);
+	ret = 0;
 	if (fields->flags != -1)
 	{
 		s = proc_width(s, fields, args);
