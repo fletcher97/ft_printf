@@ -45,7 +45,7 @@ int	proc_str(char *s, t_fields *f, char *str)
 	return (ret);
 }
 
-static int	stupid_func_bc_norm(char *temp, int ret)
+static int	stupid_func_bc_norm(char *temp, int ret, char *s)
 {
 	char	*aux;
 
@@ -56,6 +56,7 @@ static int	stupid_func_bc_norm(char *temp, int ret)
 	aux = ft_substr(temp, ft_strichr(temp, 1) + 1,
 			ft_strlen(temp) - (ft_strichr(temp, 1) + 1));
 	ft_putstr_fd(aux, STDOUT);
+	ft_putstr_fd(s, STDOUT);
 	ft_free(aux);
 	ft_free(temp);
 	return (ret);
@@ -73,7 +74,7 @@ int	proc_char(char *s, t_fields *f, char c)
 	ret = ft_strlen(temp) + ft_strlen(s);
 	if (!c)
 	{
-		return (stupid_func_bc_norm(temp, ret));
+		return (stupid_func_bc_norm(temp, ret, s));
 	}
 	ft_putstr_fd(temp, STDOUT);
 	ft_putstr_fd(s, STDOUT);
